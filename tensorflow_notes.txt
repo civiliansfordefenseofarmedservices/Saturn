@@ -1,0 +1,42 @@
+**** Installation Prerequisites:
+
+You will need to install docker.io before you can use this
+software. You will also need an Internet connection to download
+the docker image needed to classify these images. Once you
+have downloaded this image, you can save it using the "docker save"
+command and transfer it to systems that have no Internet access.
+
+**** To run TensorFlow/Saturn in Docker:
+
+sudo docker run -it --rm -v /media:/media saturnrepository/civiliansfordefenseofarmedservices:latest
+
+**** To train TensorFlow on suspicious and benign images:
+
+This application has been pre-trained by the maintainers and contributors
+to this repository, but end-users can train the image using their own
+images using this command after starting a docker container from the
+saturn:latest image (see "To run TensorFlow/Saturn in Docker" for how to
+start a docker container from the latest image).
+
+#NOTE: Run this in the docker container! DO NOT RUN IT DIRECTLY ON YOUR HOST OR
+#VIRTUAL MACHINE!
+
+#In this command, ../IMAGES is the path to a directory with two subdirectories:
+#suspect and not_suspect. The benign images go in the not_suspect directory. The
+#suspicious images go in the suspect directory.
+
+cd /root/SATURN/TENSORFLOW
+python /tensorflow/tensorflow/examples/image_retraining/retrain.py --bottleneck_dir=/root/SATURN/TENSORFLOW/tf_files/saturn_bottlenecks --how_many_training_steps 1000 --model_dir=/root/SATURN/TENSORFLOW/tf_files/inception --output_graph=/root/SATURN/TENSORFLOW/tf_files/saturn_retrained_graph.pb --output_labels=/root/SATURN/TENSORFLOW/tf_files/saturn_retrained_labels.txt --image_dir ../IMAGES/
+
+**** To classify an unknown image as either "suspect" or "not suspect":
+
+#Note: This assumes that your image is in the directory at /path/to/you and is named image.jpg
+
+cd /root/SATURN/TENSORFLOW
+python label_image.py /path/to/your/image.jpg
+#NOTE: Image does not have to be a JPEG. It can be a PNG or a GIF.
+
+**** To classify all the image files in your shared folders (under /media):
+
+cd /root/SATURN/TENSORFLOW
+python ./search_for_images.py
